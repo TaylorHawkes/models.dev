@@ -1,18 +1,22 @@
-# Prices and limits: https://inferenceapis.com/pricing and https://inferenceapis.com/models (accessed 2026-09-17)
-# Thinking off: reasoning_effort = "none", reasoning.enabled = false or thinking.type = "disabled"
-# (the gateway accepts any of the three spellings on every model that can disable thinking).
-# Effort (measured 2026-09-17): reasoning_effort = "max" roughly doubles reasoning tokens over the default; "low" and "medium" are
-# accepted but behave like "high" (the default), so only high|max are listed.
+# Toggle: reasoning_effort = "none" switches thinking off; any other value (or omitting it) leaves it on. The gateway also maps
+#   reasoning.enabled = false and thinking.type = "disabled" onto the same switch, but reasoning_effort is the canonical field.
+# Effort: reasoning_effort = low|high|max, forwarded to the host unchanged (same levels as the DeepSeek lab entry).
+# Prices and limits: https://inferenceapis.com/pricing and https://inferenceapis.com/models (accessed 2026-10-21)
+schema = 2
 base_model = "deepseek/deepseek-v4-flash"
-reasoning_options = [{ type = "toggle" }, { type = "effort", values = ["high", "max"] }]
 
-[interleaved]
-field = "reasoning_content"
-
-[cost]
-input = 0.19
-output = 0.38
-cache_read = 0.04
+[capabilities]
+reasoning = { supported = true, toggle = true, effort = ["low", "high", "max"] }
 
 [limit]
 context = 1_048_576
+
+[api.chat-completions]
+compatibility = { reasoning_field = "reasoning_content" }
+
+[cost.text.input]
+price = 0.19
+cache = { read = 0.04 }
+
+[cost.text.output]
+price = 0.38

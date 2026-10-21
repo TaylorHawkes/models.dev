@@ -1,15 +1,20 @@
-# Prices and limits: https://inferenceapis.com/pricing and https://inferenceapis.com/models (accessed 2026-09-30)
-# Thinking off: reasoning_effort = "none", reasoning.enabled = false or thinking.type = "disabled" (the gateway maps all three to this model's own switch).
+# Toggle: reasoning_effort = "none" switches thinking off; any other value (or omitting it) leaves it on. The gateway also maps
+#   reasoning.enabled = false and thinking.type = "disabled" onto the same switch, but reasoning_effort is the canonical field.
+# Effort and budget are not available on this path: measured 2026-10-21, reasoning_effort low/high and reasoning.max_tokens changed nothing
+#   systematic (23 / 36 / 67 / 94 reasoning tokens across runs of the same prompt, within run-to-run noise), only "none" switches thinking off.
+# Prices and limits: https://inferenceapis.com/pricing and https://inferenceapis.com/models (accessed 2026-10-21)
+schema = 2
 base_model = "alibaba/qwen3.8-flash"
-reasoning_options = [{ type = "toggle" }]
 
-[interleaved]
-field = "reasoning_content"
+[capabilities]
+reasoning = { supported = true, toggle = true }
 
-[cost]
-input = 0.15
-output = 0.5
-cache_read = 0.02
+[api.chat-completions]
+compatibility = { reasoning_field = "reasoning_content" }
 
-[limit]
-context = 1_000_000
+[cost.text.input]
+price = 0.15
+cache = { read = 0.02 }
+
+[cost.text.output]
+price = 0.5

@@ -1,20 +1,27 @@
-# Prices and limits: https://inferenceapis.com/pricing and https://inferenceapis.com/models (accessed 2026-09-17)
-# Thinking off: reasoning_effort = "none", reasoning.enabled = false or thinking.type = "disabled"
-# (the gateway accepts any of the three spellings on every model that can disable thinking).
-# JSON mode and json_schema currently fail at the upstream host, so structured_output is off here. Text input only.
+# Toggle: reasoning_effort = "none" switches thinking off; any other value (or omitting it) leaves it on. The gateway also maps
+#   reasoning.enabled = false and thinking.type = "disabled" onto the same switch, but reasoning_effort is the canonical field.
+# Measured on this gateway 2026-10-21: default request returned reasoning_content (18 reasoning tokens); reasoning_effort = "none" returned
+#   no reasoning field and 0 reasoning tokens, so the switch is real on this host even though the lab serves thinking always-on.
+# JSON mode and json_schema fail at the upstream host, so structured_output is off here. Text input only.
+# Prices and limits: https://inferenceapis.com/pricing and https://inferenceapis.com/models (accessed 2026-10-21)
+schema = 2
 base_model = "moonshotai/kimi-k2.7-code"
-attachment = false
-structured_output = false
-reasoning_options = [{ type = "toggle" }]
 
-[interleaved]
-field = "reasoning_content"
-
+# [modalities] must carry both keys when present (schema), so output is restated even though it equals the lab value.
 [modalities]
 input = ["text"]
 output = ["text"]
 
-[cost]
-input = 0.89
-output = 4.42
-cache_read = 0.18
+[capabilities]
+reasoning = { supported = true, toggle = true }
+structured_output = false
+
+[api.chat-completions]
+compatibility = { reasoning_field = "reasoning_content" }
+
+[cost.text.input]
+price = 0.89
+cache = { read = 0.18 }
+
+[cost.text.output]
+price = 4.42
